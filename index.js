@@ -2,8 +2,10 @@ require("dotenv").config();
 const port = process.env.PORT;
 const io = require("socket.io")(port, {
   cors: {
-    origin: process.env.REACT_APP_URL,
-  },
+    origin: "*",
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: "*"
+  }
 });
 let users = [];
 
