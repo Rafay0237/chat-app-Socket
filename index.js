@@ -1,10 +1,12 @@
 require("dotenv").config();
 const port = process.env.PORT;
 
-app.use(cors());
-
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
+const io = require("socket.io")(port, {
+  cors: {
+    origin: "*",
+    allowedHeaders: "*"
+  }
+});
 
 let users = [];
 
