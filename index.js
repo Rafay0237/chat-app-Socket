@@ -35,31 +35,48 @@ const getUser = (userId) => {
   return users.find((user) => user.userId === userId);
 };
 
-
 io.on("connection", (socket) => {
   console.log("User Connected");
 
-      socket.on("disconnect", () => {
-        removeUsers(socket.id);
-        console.log("User Disconnected");
-        io.emit("getUsers", users);
-});
+  socket.on("disconnect", () => {
+    removeUsers(socket.id);
+    console.log("User Disconnected");
+    io.emit("getUsers", users);
+  });
 
-socket.on("addUser", (userId) => {
-        addUsers(userId, socket.id);
-        io.emit("getUsers", users);
-      });
+  socket.on("addUser", (userId) => {
+    addUsers(userId, socket.id);
+    io.emit("getUsers", users);
+  });
 
-      socket.emit("getUsers", users);
+  socket.emit("getUsers", users);
 
-      socket.on("sendMessage", ({ senderId, receiverId, text }) => {
-  const receiver = getUser(receiverId);
-        if (!receiver) return;
-        socket.to(receiver.socketId).emit("getMessage", {
-          senderId,
-          text,
-        });
-      });
+  socket.on("sendMessage", ({ senderId, receiverId, text }) => {
+    const receiver = getUser(receiverId);
+    if (!receiver) return;
+    socket.to(receiver.socketId).emit("getMessage", {
+      senderId,
+      text
+    });
+  });
 
-      console.log(users);
+  socket.on("sendImage", ({ senderId, receiverId, img }) => {
+    const receiver = getUser(receiverId);
+    if (!receiver) return;
+    socket.to(receiver.socketId).emit("getImage", {
+      senderId,
+      img
+    });
+  });
+
+  socket.on("messageSeen", ({ conversationId, sender }) => {
+    const receiver = getUser(sender);
+    if (!receiver) return;
+    socket.to(receiver.socketId).emit("updateMessageSeen", {
+      conversationId,
+      sender
+    });
+  });
+
+  console.log(users);
 });
